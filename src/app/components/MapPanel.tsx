@@ -90,7 +90,7 @@ const routeGlowLayer: any = {
 const routeLineLayer: any = {
   id: "route-line",
   type: "line",
-  source: "route-data", // This fixes the error
+  source: "route-data",
   layout: {
     "line-join": "round",
     "line-cap": "round",
@@ -98,7 +98,7 @@ const routeLineLayer: any = {
   paint: {
     "line-color": "#58a6ff",
     "line-width": 3,
-    "line-dasharray":,
+    "line-dasharray": [2, 3],
   },
 };
 
