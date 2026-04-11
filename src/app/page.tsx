@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { PanelRightClose, PanelRightOpen, Anchor } from "lucide-react";
+import { PanelRightClose, PanelRightOpen } from "lucide-react";
 import MapPanel from "./components/MapPanel";
 import ChatPanel from "./components/ChatPanel";
 import initialVenueState from "@/data/venueState.json";

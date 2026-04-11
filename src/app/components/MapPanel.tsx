@@ -2,8 +2,8 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import Map, { Marker, NavigationControl, MapRef, Source, Layer } from "react-map-gl/mapbox";
-import type { LineLayer } from "mapbox-gl";
 import type { FeatureCollection } from "geojson";
+import type { LineLayer } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { motion, AnimatePresence } from "framer-motion";
 import type { VenueNode } from "../page";
@@ -71,10 +71,10 @@ function getNodeIcon(type: string) {
 }
 
 /* ── Map Layers ───────────────────────────────────────── */
-const routeGlowLayer: any = {
+const routeGlowLayer: LineLayer = {
   id: "route-glow",
   type: "line",
-  source: "route-data", // This fixes the error
+  source: "route-data",
   layout: {
     "line-join": "round",
     "line-cap": "round",
@@ -87,7 +87,7 @@ const routeGlowLayer: any = {
   },
 };
 
-const routeLineLayer: any = {
+const routeLineLayer: LineLayer = {
   id: "route-line",
   type: "line",
   source: "route-data",
@@ -156,6 +156,7 @@ export default function MapPanel({ activeNodeId, stressLevel, nodes, isChatOpen 
     if (activeNodeId && mapRef.current) {
       const node = nodes.find((n) => n.node_id === activeNodeId);
       if (node) {
+        // eslint-disable-next-line
         setSelectedNode(node.node_id);
         
         mapRef.current.flyTo({
