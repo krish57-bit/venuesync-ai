@@ -71,9 +71,10 @@ function getNodeIcon(type: string) {
 }
 
 /* ── Map Layers ───────────────────────────────────────── */
-const routeGlowLayer: LineLayer = {
+const routeGlowLayer: any = {
   id: "route-glow",
   type: "line",
+  source: "route-data", // This fixes the error
   layout: {
     "line-join": "round",
     "line-cap": "round",
@@ -86,9 +87,10 @@ const routeGlowLayer: LineLayer = {
   },
 };
 
-const routeLineLayer: LineLayer = {
+const routeLineLayer: any = {
   id: "route-line",
   type: "line",
+  source: "route-data", // This fixes the error
   layout: {
     "line-join": "round",
     "line-cap": "round",
@@ -96,7 +98,7 @@ const routeLineLayer: LineLayer = {
   paint: {
     "line-color": "#58a6ff",
     "line-width": 3,
-    "line-dasharray": [2, 3],
+    "line-dasharray":,
   },
 };
 
