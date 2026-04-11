@@ -1,65 +1,117 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { PanelRightClose, PanelRightOpen, Anchor } from "lucide-react";
+import MapPanel from "./components/MapPanel";
+import ChatPanel from "./components/ChatPanel";
+import initialVenueState from "@/data/venueState.json";
+
+export interface VenueNode {
+  node_id: string;
+  label: string;
+  type: string;
+  coordinates: { lat: number; lng: number };
+  base_processing_time: number;
+  density_multiplier: number;
+  elevation_level: number;
+  pending_arrivals: number;
+}
 
 export default function Home() {
+  const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
+  const [stressLevel, setStressLevel] = useState<number>(1.0);
+  const [nodes, setNodes] = useState<VenueNode[]>(initialVenueState.nodes);
+  const [isChatOpen, setIsChatOpen] = useState(true);
+
+  // Closed-loop helper to update pending arrivals in the frontend state
+  const handleRouteAssigned = (nodeId: string) => {
+    setActiveNodeId(nodeId);
+    setNodes((prevNodes) =>
+      prevNodes.map((node) =>
+        node.node_id === nodeId
+          ? { ...node, pending_arrivals: node.pending_arrivals + 1 }
+          : node
+      )
+    );
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main
+      id="venue-sync-main"
+      className="relative flex h-full w-full overflow-hidden"
+      style={{ background: "#0A0A0A" }}
+    >
+      {/* ── Radial gradient glow — top-center like Linear ── */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0 transition-colors duration-1000"
+        style={{
+          background:
+            stressLevel > 2.0
+              ? "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(248,81,73,0.15), rgba(10,10,10,0) 60%)"
+              : "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(88,166,255,0.08), rgba(10,10,10,0) 60%)",
+        }}
+      />
+
+      {/* ── Map Panel Wrapper ── */}
+      <motion.div
+        initial={false}
+        animate={{
+          flex: isChatOpen ? 1 : 1, // Let flex-1 naturally handle width
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="flex-1 relative h-full min-w-0"
+      >
+        <MapPanel
+          activeNodeId={activeNodeId}
+          stressLevel={stressLevel}
+          nodes={nodes}
+          isChatOpen={isChatOpen}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+        
+        {/* Toggle Button (when chat is closed) */}
+        <AnimatePresence>
+          {!isChatOpen && (
+            <motion.button
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              onClick={() => setIsChatOpen(true)}
+              className="absolute top-1/2 right-4 -translate-y-1/2 z-50 p-2.5 rounded-full bg-black/60 border border-white/10 backdrop-blur-xl text-white/70 hover:text-white cursor-pointer shadow-xl hover:bg-white/[0.08] transition-colors"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              <PanelRightOpen size={20} />
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </motion.div>
+
+      {/* ── Chat Panel Wrapper ── */}
+      <motion.div
+        initial={false}
+        animate={{
+          width: isChatOpen ? "100%" : "0%",
+          opacity: isChatOpen ? 1 : 0,
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="absolute inset-y-0 right-0 z-40 md:relative md:max-w-[40%] lg:max-w-md h-full shrink-0 overflow-hidden bg-black/90 md:bg-transparent backdrop-blur-2xl md:backdrop-blur-none border-l border-white/10 shadow-2xl md:shadow-none"
+      >
+        {/* Toggle Button (when chat is open) */}
+        <button
+          onClick={() => setIsChatOpen(false)}
+          className="absolute top-1/2 -left-4 -translate-y-1/2 z-50 p-1.5 rounded-full bg-[#111] border border-white/10 text-white/50 hover:text-white cursor-pointer shadow-xl hover:bg-[#222] transition-colors"
+        >
+          <PanelRightClose size={16} />
+        </button>
+
+        <div className="w-full h-full min-w-[320px]">
+          <ChatPanel
+            onRouteAssigned={handleRouteAssigned}
+            stressLevel={stressLevel}
+            setStressLevel={setStressLevel}
+            nodes={nodes}
+          />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </motion.div>
+    </main>
   );
 }

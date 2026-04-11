@@ -1,0 +1,86 @@
+{
+  "venue_name": "Chandigarh Sports Complex",
+  "last_updated": "2026-04-12T00:30:00+05:30",
+  "nodes": [
+    {
+      "node_id": "G1",
+      "label": "Gate A — Main Entrance",
+      "type": "Gate",
+      "coordinates": { "lat": 30.7350, "lng": 76.7780 },
+      "base_processing_time": 12,
+      "density_multiplier": 1.2,
+      "elevation_level": 1,
+      "pending_arrivals": 0
+    },
+    {
+      "node_id": "G2",
+      "label": "Gate B — VIP Entrance",
+      "type": "Gate",
+      "coordinates": { "lat": 30.7345, "lng": 76.7815 },
+      "base_processing_time": 8,
+      "density_multiplier": 2.6,
+      "elevation_level": 1,
+      "pending_arrivals": 0
+    },
+    {
+      "node_id": "C1",
+      "label": "Food Court North",
+      "type": "Concession",
+      "coordinates": { "lat": 30.7338, "lng": 76.7790 },
+      "base_processing_time": 45,
+      "density_multiplier": 1.8,
+      "elevation_level": 1,
+      "pending_arrivals": 0
+    },
+    {
+      "node_id": "C2",
+      "label": "Merch Stand East",
+      "type": "Concession",
+      "coordinates": { "lat": 30.7330, "lng": 76.7810 },
+      "base_processing_time": 30,
+      "density_multiplier": 1.0,
+      "elevation_level": 2,
+      "pending_arrivals": 0
+    },
+    {
+      "node_id": "E1",
+      "label": "Exit North",
+      "type": "Exit",
+      "coordinates": { "lat": 30.7355, "lng": 76.7794 },
+      "base_processing_time": 5,
+      "density_multiplier": 3.0,
+      "elevation_level": 1,
+      "pending_arrivals": 0
+    },
+    {
+      "node_id": "E2",
+      "label": "Exit South",
+      "type": "Exit",
+      "coordinates": { "lat": 30.7315, "lng": 76.7794 },
+      "base_processing_time": 5,
+      "density_multiplier": 1.4,
+      "elevation_level": 1,
+      "pending_arrivals": 0
+    },
+    {
+      "node_id": "S1",
+      "label": "Section 101 — Lower Bowl",
+      "type": "Seating",
+      "coordinates": { "lat": 30.7340, "lng": 76.7775 },
+      "base_processing_time": 0,
+      "density_multiplier": 2.1,
+      "elevation_level": 1,
+      "pending_arrivals": 0
+    },
+    {
+      "node_id": "S2",
+      "label": "Section 202 — Upper Deck",
+      "type": "Seating",
+      "coordinates": { "lat": 30.7340, "lng": 76.7812 },
+      "base_processing_time": 0,
+      "density_multiplier": 1.5,
+      "elevation_level": 2,
+      "pending_arrivals": 0
+    }
+  ]
+}
