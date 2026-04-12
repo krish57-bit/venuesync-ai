@@ -348,7 +348,7 @@ export default function MapPanel({ activeNodeId, stressLevel, nodes, isChatOpen 
         <Map
           key={mapboxToken}
           ref={mapRef}
-          mapboxAccessToken={mapboxToken}
+          mapboxAccessToken="pk.eyJ1Ijoia3Jpc2gyMzEiLCJhIjoiY21jb3Y5Njk3MGQ0aDJsc2Zrc3FidHJhdSJ9.seE6GqLlhfGppq40Ray1qw"
           onLoad={() => setMapLoaded(true)}
           onError={(e) => setMapError(`Mapbox Engine: ${e.error.message}`)}
           initialViewState={{
