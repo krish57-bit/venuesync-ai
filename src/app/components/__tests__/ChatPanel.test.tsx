@@ -69,7 +69,7 @@ describe('ChatPanel Component', () => {
     const input = screen.getByPlaceholderText(/Initialize query/i);
     fireEvent.change(input, { target: { value: 'Find exit' } });
     
-    const sendButton = screen.getByLabelText(/Send Query/i);
+    const sendButton = screen.getByLabelText(/Send message/i);
     fireEvent.click(sendButton);
 
     expect(sendGAEvent).toHaveBeenCalledWith({
@@ -99,7 +99,7 @@ describe('ChatPanel Component', () => {
     // However, the setInput("") happens immediately in handleSend.
     // We can check if the rendered message (the user bubbles) are sanitized.
     
-    const sendButton = screen.getByLabelText(/Send Query/i);
+    const sendButton = screen.getByLabelText(/Send message/i);
     fireEvent.click(sendButton);
 
     expect(screen.getByText(/&lt;script&gt;alert\(1\)&lt;\/script&gt;/i)).toBeInTheDocument();
