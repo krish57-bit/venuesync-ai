@@ -6,11 +6,6 @@ import type { FeatureCollection } from "geojson";
 import type { LineLayer } from "mapbox-gl";
 import mapboxgl from "mapbox-gl";
 
-// Production Fix: Initialize global mapbox token to prevent "missing token" errors
-if (process.env.NEXT_PUBLIC_MAPBOX_TOKEN) {
-  mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-}
-
 import "mapbox-gl/dist/mapbox-gl.css";
 import { motion, AnimatePresence } from "framer-motion";
 import type { VenueNode } from "../page";
@@ -118,6 +113,41 @@ export default function MapPanel({ activeNodeId, stressLevel, nodes, isChatOpen 
   const [routeProgress, setRouteProgress] = useState(0);
 
   const [currentVenue, setCurrentVenue] = useState('chandigarh');
+
+  const [mapboxToken, setMapboxToken] = useState<string | null>(
+    typeof process !== 'undefined' && process.env.NEXT_PUBLIC_MAPBOX_TOKEN
+      ? process.env.NEXT_PUBLIC_MAPBOX_TOKEN
+      : null
+  );
+
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // If we don't have a token or it looks like a placeholder, fetch from our runtime API
+    const isInvalid = !mapboxToken || mapboxToken === 'undefined' || mapboxToken === '' || mapboxToken.length < 10;
+    
+    if (isInvalid) {
+      console.log("VenueSync: Token missing or invalid, fetching from API...");
+      fetch('/api/mapbox')
+        .then(res => res.json())
+        .then(data => {
+          if (data.token && data.token.startsWith('pk.')) {
+            console.log("VenueSync: Mapbox token successfully initialized from runtime API.");
+            mapboxgl.accessToken = data.token;
+            setMapboxToken(data.token);
+          } else {
+            setMapError("Mapbox token missing in environment variables. Please set MAPBOX_TOKEN in your cloud console.");
+          }
+        })
+        .catch(err => {
+          console.error("VenueSync: API fetch error:", err);
+          setMapError("Failed to connect to internal configuration API.");
+        });
+    } else {
+      mapboxgl.accessToken = mapboxToken!;
+    }
+  }, [mapboxToken]);
 
   const mapRef = useRef<MapRef>(null);
 
@@ -289,21 +319,50 @@ export default function MapPanel({ activeNodeId, stressLevel, nodes, isChatOpen 
       </div>
 
       {/* ── Mapbox Canvas ── */}
-      <Map
-        ref={mapRef}
-        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
-        initialViewState={{
-          latitude: 30.7333,
-          longitude: 76.7794,
-          zoom: 15,
-          pitch: 45,
-          bearing: -15,
-        }}
-        style={{ width: "100%", height: "100%" }}
-        mapStyle="mapbox://styles/mapbox/dark-v11"
-        attributionControl={false}
-        reuseMaps
-      >
+      {mapError ? (
+        <div className="w-full h-full flex flex-col items-center justify-center bg-[#070101] border-r border-accent-red/20 p-8 text-center">
+          <div className="w-12 h-12 rounded-full bg-accent-red/10 border border-accent-red/30 flex items-center justify-center mb-6">
+            <span className="text-xl">⚠️</span>
+          </div>
+          <h2 className="text-white font-bold tracking-tight mb-2">Spatial Engine Connection Lost</h2>
+          <p className="text-accent-red/80 font-mono text-[10px] leading-relaxed max-w-xs uppercase tracking-widest">{mapError}</p>
+          <div className="mt-8 pt-8 border-t border-white/5 w-full max-w-xs text-[9px] text-text-muted font-mono uppercase tracking-tighter">
+            Check Cloud Service Environment Variables & <br/> Mapbox Dashboard Domain Restrictions
+          </div>
+        </div>
+      ) : !mapboxToken ? (
+        <div className="w-full h-full flex flex-col items-center justify-center bg-[#050505] border-r border-white/5">
+          <div className="flex flex-col items-center gap-4">
+            <motion.div 
+              animate={{ rotate: 360 }} 
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }} 
+              className="w-8 h-8 border-2 border-accent-cyan border-t-transparent rounded-full shadow-[0_0_15px_rgba(88,166,255,0.3)]" 
+            />
+            <div className="flex flex-col items-center gap-1 text-center">
+              <span className="text-white font-mono text-[10px] tracking-[0.2em] uppercase opacity-80">System Initializing</span>
+              <span className="text-text-muted font-mono text-[9px] uppercase tracking-widest">Awaiting Spatial Token...</span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <Map
+          key={mapboxToken}
+          ref={mapRef}
+          mapboxAccessToken={mapboxToken}
+          onLoad={() => setMapLoaded(true)}
+          onError={(e) => setMapError(`Mapbox Engine: ${e.error.message}`)}
+          initialViewState={{
+            latitude: 30.7333,
+            longitude: 76.7794,
+            zoom: 15,
+            pitch: 45,
+            bearing: -15,
+          }}
+          style={{ width: "100%", height: "100%" }}
+          mapStyle="mapbox://styles/mapbox/dark-v11"
+          attributionControl={false}
+          reuseMaps
+        >
         <NavigationControl position="bottom-right" showCompass showZoom />
 
         {/* ── Dynamic Drawing Path Source & Layers ── */}
@@ -313,8 +372,6 @@ export default function MapPanel({ activeNodeId, stressLevel, nodes, isChatOpen 
             <Layer {...routeLineLayer} paint={{...routeLineLayer.paint, "line-color": stressLevel > 2.0 ? "#f85149" : "#58a6ff"}} />
           </Source>
         )}
-
-        {/* ── User Location Marker ── */}
         <Marker longitude={MOCK_USER_COORDS[0]} latitude={MOCK_USER_COORDS[1]} anchor="center">
           <div className="relative flex items-center justify-center">
             <motion.div
@@ -476,6 +533,7 @@ export default function MapPanel({ activeNodeId, stressLevel, nodes, isChatOpen 
           );
         })}
       </Map>
+    )}
 
       {/* ── Bottom status bar ── */}
       <div className="absolute bottom-0 inset-x-0 z-20 flex items-center justify-between px-6 py-3 glass-panel border-t-0 border-white/[0.04] text-[10px] text-text-muted font-mono uppercase tracking-widest">
