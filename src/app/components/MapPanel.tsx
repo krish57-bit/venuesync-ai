@@ -4,6 +4,13 @@ import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import Map, { Marker, NavigationControl, MapRef, Source, Layer } from "react-map-gl/mapbox";
 import type { FeatureCollection } from "geojson";
 import type { LineLayer } from "mapbox-gl";
+import mapboxgl from "mapbox-gl";
+
+// Production Fix: Initialize global mapbox token to prevent "missing token" errors
+if (process.env.NEXT_PUBLIC_MAPBOX_TOKEN) {
+  mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+}
+
 import "mapbox-gl/dist/mapbox-gl.css";
 import { motion, AnimatePresence } from "framer-motion";
 import type { VenueNode } from "../page";
