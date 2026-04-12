@@ -39,6 +39,7 @@ export default function Home() {
   return (
     <main
       id="venue-sync-main"
+      aria-label="VenueSync AI Command Dashboard"
       className="relative flex h-full w-full overflow-hidden"
       style={{ background: "#0A0A0A" }}
     >
@@ -76,8 +77,9 @@ export default function Home() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
+              aria-label="Open AI Consultation Panel"
               onClick={() => setIsChatOpen(true)}
-              className="absolute top-1/2 right-4 -translate-y-1/2 z-50 p-2.5 rounded-full bg-black/60 border border-white/10 backdrop-blur-xl text-white/70 hover:text-white cursor-pointer shadow-xl hover:bg-white/[0.08] transition-colors"
+              className="absolute top-1/2 right-4 -translate-y-1/2 z-50 p-2.5 rounded-full bg-black/60 border border-white/10 backdrop-blur-xl text-white/70 hover:text-white cursor-pointer shadow-xl hover:bg-white/[0.08] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
             >
               <PanelRightOpen size={20} />
             </motion.button>
@@ -98,7 +100,8 @@ export default function Home() {
         {/* Toggle Button (when chat is open) */}
         <button
           onClick={() => setIsChatOpen(false)}
-          className="absolute top-1/2 -left-4 -translate-y-1/2 z-50 p-1.5 rounded-full bg-[#111] border border-white/10 text-white/50 hover:text-white cursor-pointer shadow-xl hover:bg-[#222] transition-colors"
+          aria-label="Close AI Consultation Panel"
+          className="absolute top-1/2 -left-4 -translate-y-1/2 z-50 p-1.5 rounded-full bg-[#111] border border-white/10 text-white/50 hover:text-white cursor-pointer shadow-xl hover:bg-[#222] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
         >
           <PanelRightClose size={16} />
         </button>

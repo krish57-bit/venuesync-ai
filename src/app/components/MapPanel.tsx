@@ -259,6 +259,7 @@ export default function MapPanel({ activeNodeId, stressLevel, nodes, isChatOpen 
   return (
     <section
       id="map-panel"
+      aria-label="Interactive Spatial Twin"
       className="relative z-0 flex-[3] min-w-0 h-full overflow-hidden select-none"
     >
       {/* ── Top Left Controls ── */}
@@ -285,8 +286,9 @@ export default function MapPanel({ activeNodeId, stressLevel, nodes, isChatOpen 
         {/* Venue Switcher */}
         <div className="hidden sm:block pointer-events-auto">
           <select 
-            className="bg-black/60 backdrop-blur-md text-slate-300 text-[11.5px] font-mono tracking-wide px-4 py-2 rounded-full border border-white/10 outline-none hover:text-white cursor-pointer transition-colors shadow-lg appearance-none"
+            className="bg-black/60 backdrop-blur-md text-slate-300 text-[11.5px] font-mono tracking-wide px-4 py-2 rounded-full border border-white/10 outline-none hover:text-white cursor-pointer transition-colors shadow-lg appearance-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
             value={currentVenue}
+            aria-label="Select Venue / Event Site"
             onChange={handleVenueChange}
             style={{ 
               backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239CA3AF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
@@ -348,7 +350,7 @@ export default function MapPanel({ activeNodeId, stressLevel, nodes, isChatOpen 
         <Map
           key={mapboxToken}
           ref={mapRef}
-          mapboxAccessToken="pk.eyJ1Ijoia3Jpc2gyMzEiLCJhIjoiY21jb3Y5Njk3MGQ0aDJsc2Zrc3FidHJhdSJ9.seE6GqLlhfGppq40Ray1qw"
+          mapboxAccessToken={mapboxToken || ""}
           onLoad={() => setMapLoaded(true)}
           onError={(e) => setMapError(`Mapbox Engine: ${e.error.message}`)}
           initialViewState={{

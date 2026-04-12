@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { sendGAEvent } from "@next/third-parties/google";
 import type { VenueNode } from "../page";
 
 /* ── Types ────────────────────────────────────────────── */
@@ -61,6 +62,14 @@ const thinkingDotVariants = {
   },
 };
 
+/* ── Helpers ──────────────────────────────────────────── */
+const sanitizeInput = (str: string) => {
+  return str.replace(/[<>]/g, (tag) => ({
+    '<': '&lt;',
+    '>': '&gt;'
+  }[tag] || tag));
+};
+
 /* ── Chat Panel Component ─────────────────────────────── */
 export default function ChatPanel({ onRouteAssigned, stressLevel, setStressLevel, nodes }: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>(() => [
@@ -88,7 +97,7 @@ export default function ChatPanel({ onRouteAssigned, stressLevel, setStressLevel
   }, [messages, isTyping]);
 
   const handleSend = async () => {
-    const text = input.trim();
+    const text = sanitizeInput(input.trim());
     if (!text) return;
 
     const userMsg: Message = {
@@ -100,6 +109,9 @@ export default function ChatPanel({ onRouteAssigned, stressLevel, setStressLevel
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsTyping(true);
+
+    // Trigger Google Analytics Event
+    sendGAEvent({ event: "chat_message_sent", value: text.length });
 
     try {
       const response = await fetch("/api/chat", {
@@ -152,8 +164,9 @@ export default function ChatPanel({ onRouteAssigned, stressLevel, setStressLevel
   };
 
   return (
-    <section
+    <aside
       id="chat-panel"
+      aria-label="AI Consultation Panel"
       className="relative z-10 w-full min-w-0 h-full flex flex-col border-l border-white/[0.08] bg-white/[0.02] backdrop-blur-2xl transition-colors duration-1000"
       style={{ backgroundColor: stressLevel > 2.0 ? "rgba(248,81,73,0.03)" : "rgba(255,255,255,0.02)" }}
     >
@@ -181,7 +194,7 @@ export default function ChatPanel({ onRouteAssigned, stressLevel, setStressLevel
       {/* ── Enterprise Control: Panic Slider ── */}
       <div className="px-6 py-4 border-b border-white/[0.04] bg-black/20 shrink-0">
         <div className="flex items-center justify-between mb-2">
-           <label className="text-[11px] font-mono tracking-widest uppercase text-text-secondary">Venue Stress Level</label>
+           <label id="stress-label" className="text-[11px] font-mono tracking-widest uppercase text-text-secondary">Venue Stress Level</label>
            <span className={`text-[11px] font-mono font-bold ${stressLevel > 2.0 ? 'text-accent-red' : 'text-accent-cyan'}`}>
              {stressLevel.toFixed(1)}x
            </span>
@@ -192,8 +205,9 @@ export default function ChatPanel({ onRouteAssigned, stressLevel, setStressLevel
            max="3.0" 
            step="0.1" 
            value={stressLevel} 
+           aria-labelledby="stress-label"
            onChange={(e) => setStressLevel(parseFloat(e.target.value))}
-           className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-accent-cyan"
+           className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-accent-cyan focus-visible:ring-2 focus-visible:ring-accent-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-all outline-none"
            style={{ accentColor: stressLevel > 2.0 ? '#f85149' : '#58a6ff' }}
         />
         {stressLevel > 2.0 && (
@@ -206,6 +220,9 @@ export default function ChatPanel({ onRouteAssigned, stressLevel, setStressLevel
       {/* ── Messages ── */}
       <div
         ref={scrollRef}
+        role="log"
+        aria-live="polite"
+        aria-relevant="additions"
         className="flex-1 overflow-y-auto px-6 py-6 space-y-4"
       >
         <AnimatePresence mode="popLayout">
@@ -296,11 +313,12 @@ export default function ChatPanel({ onRouteAssigned, stressLevel, setStressLevel
         ].map((chip) => (
           <motion.button
             key={chip}
+            aria-label={`Ask AI: ${chip}`}
             onClick={() => {
               setInput(chip);
               inputRef.current?.focus();
             }}
-            className="text-[11.5px] px-3.5 py-1.5 rounded-full border border-white/[0.08] text-slate-400 bg-black/20 cursor-pointer shadow-sm"
+            className="text-[11.5px] px-3.5 py-1.5 rounded-full border border-white/[0.08] text-slate-400 bg-black/20 cursor-pointer shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
             whileHover={{
               borderColor: stressLevel > 2.0 ? "rgba(248,81,73,0.3)" : "rgba(88,166,255,0.3)",
               color: stressLevel > 2.0 ? "#f85149" : "#58a6ff",
@@ -337,6 +355,7 @@ export default function ChatPanel({ onRouteAssigned, stressLevel, setStressLevel
             id="chat-input"
             type="text"
             value={input}
+            aria-label="Type your message"
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             onFocus={() => setIsFocused(true)}
@@ -346,9 +365,10 @@ export default function ChatPanel({ onRouteAssigned, stressLevel, setStressLevel
           />
           <motion.button
             id="chat-send-button"
+            aria-label="Send message"
             onClick={handleSend}
             disabled={!input.trim() || isTyping}
-            className="w-8 h-8 rounded-xl flex items-center justify-center disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+            className="w-8 h-8 rounded-xl flex items-center justify-center disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-accent-cyan"
             style={{ background: stressLevel > 2.0 ? "rgba(248,81,73,0.1)" : "rgba(88,166,255,0.1)" }}
             whileHover={
               input.trim() && !isTyping
@@ -369,6 +389,6 @@ export default function ChatPanel({ onRouteAssigned, stressLevel, setStressLevel
           </motion.button>
         </motion.div>
       </div>
-    </section>
+    </aside>
   );
 }

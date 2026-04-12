@@ -1,6 +1,6 @@
 # VenueSync AI — Predictive Digital Twin & Crowd Load-Balancer
 
-**VenueSync AI** is an enterprise-grade spatial digital twin designed to actively monitor, manage, and load-balance large-scale venue crowds in real-time. Powered by **Next.js 15**, **Mapbox GL**, and the **Gemini 2.5 Flash** cognitive engine, the system utilizes artificial intelligence to calculate optimal routes, bypass dynamic bottlenecks, simulate IoT environmental feeds, and instantly enact systemic evacuation protocols.
+**VenueSync AI** is an enterprise-grade spatial digital twin designed to actively monitor, manage, and load-balance large-scale venue crowds in real-time. Powered by **Next.js 15**, **Mapbox GL**, and the **Gemini 2.0 Flash** cognitive engine, the system utilizes artificial intelligence to calculate optimal routes, bypass dynamic bottlenecks, simulate IoT environmental feeds, and instantly enact systemic evacuation protocols.
 
 ---
 
@@ -13,7 +13,7 @@
 
 ### 🗺️ Real-Time Spatial Digital Twin
 - **Dynamic Pathfinding Cinematics**: Visual Mapbox integration smoothly flies the camera to targeted nodes while animating a dual-layer cyan path tracking from the user's origin to the destination.
-- **Multi-Event Switching**: The platform scales simultaneously. An interactive Command Module drop-down instantly sweeps the viewport across the globe (e.g., Active Stadium, Simulated Sector, Offline Exhibition) to monitor disparate geographic events.
+- **Multi-Event Context Switching**: The platform scales globally. An interactive Command Module drop-down instantly sweeps the viewport across the globe (e.g., Chandigarh Sports Complex, Sector 17 Plaza, Exhibition Ground) to monitor disparate geographic events simultaneously.
 - **Micro-Animations & IoT Hardware**: Pulsing radar loops denote zone density thresholds. Absolute top-level layout tracking monitors mocked live feeds of `LiDAR`, `Thermal`, and `Ticketing Edge` sensors.
 
 ### 🚨 Autonomous Panic Propagation ("Evacuation Mode")
@@ -27,10 +27,11 @@ An adjustable Venue Stress Level actively monitors event dynamics:
 ## 💻 Tech Stack
 
 - **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
 - **Animations**: [Framer Motion](https://www.framer.com/motion/)
-- **Mapping/GIS**: [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/api/) & [react-map-gl](https://visgl.github.io/react-map-gl/)
-- **LLM Cognitive Core**: [@google/generative-ai](https://www.npmjs.com/package/@google/generative-ai) (Gemini 2.5 Flash)
+- **Mapping/GIS**: [Mapbox GL JS v3](https://docs.mapbox.com/mapbox-gl-js/api/) & [react-map-gl](https://visgl.github.io/react-map-gl/)
+- **LLM Cognitive Core**: [Google Gemini 2.0 Flash](https://ai.google.dev/models/gemini)
 
 ---
 
@@ -58,15 +59,14 @@ GEMINI_API_KEY=your_gemini_api_key
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) with your browser to launch the Command Center.
 
 ---
 
 ## 🎨 Enterprise UI/UX Architecture
-Vigorously modeled after top-tier design systems, the layout is deeply rooted in modern web application aesthetics:
-- **Glassmorphism**: Elegant sheer `bg-white/[0.02]` backgrounds heavily blurred with `backdrop-blur-2xl`. 
+Vigorously modeled after top-tier design systems like Linear and Vercel, the layout is deeply rooted in modern web application aesthetics:
+- **Glassmorphism & Hud Design**: Elegant sheer `bg-white/[0.02]` backgrounds heavily blurred with `backdrop-blur-2xl`. 
 - **Kinetic Physics**: Chat bubbles effortlessly pop into view using raw physics-based spring animations (`stiffness: 400`, `damping: 25`).
-- **Responsive Layout Architecture**: On desktop, the user engages in a 60/40 cinematic split-screen. On smartphones, the layout structurally refactors via Flexbox, shifting the Chat into a full-screen overlay to prevent map crushing on small viewports.
+- **Responsive Hybrid Layout**: On desktop, the user engages in a 60/40 cinematic split-screen. On smartphones, the layout structurally refactors via Flexbox, shifting the Chat into a full-screen overlay to prevent map crushing on small viewports.
 
 ---
 
