@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PanelRightClose, PanelRightOpen } from "lucide-react";
 import MapPanel from "./components/MapPanel";
 import ChatPanel from "./components/ChatPanel";
 import initialVenueState from "@/data/venueState.json";
+import { db } from "@/lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 export interface VenueNode {
   node_id: string;
@@ -23,6 +25,26 @@ export default function Home() {
   const [stressLevel, setStressLevel] = useState<number>(1.0);
   const [nodes, setNodes] = useState<VenueNode[]>(initialVenueState.nodes);
   const [isChatOpen, setIsChatOpen] = useState(true);
+
+  // Synchronize with Firebase Firestore (Google Services Integration)
+  useEffect(() => {
+    const fetchNodes = async () => {
+      console.warn("VenueSync (Google Services): Connecting to Firebase Cloud Firestore...");
+      try {
+        const querySnapshot = await getDocs(collection(db, "venues", "chandigarh", "nodes"));
+        if (!querySnapshot.empty) {
+          const fbNodes: VenueNode[] = querySnapshot.docs.map(doc => doc.data() as VenueNode);
+          setNodes(fbNodes);
+        } else {
+          console.warn("VenueSync: Firebase returned empty snapshot. Using local venue state (Fallback).");
+        }
+      } catch (error) {
+        // Graceful fallback to initial local state when there are missing Firebase mock credentials locally
+        console.warn("VenueSync: Using local venue state (Firebase fallback)", error);
+      }
+    };
+    fetchNodes();
+  }, []);
 
   // Closed-loop helper to update pending arrivals in the frontend state
   const handleRouteAssigned = (nodeId: string) => {
